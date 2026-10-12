@@ -1,5 +1,9 @@
 {
-  "appId": "com.respirefacil.app",
+  "appId": "br.com.respirefacil.app",
   "appName": "Respire Fácil",
-  "webDir": "www"
+  "webDir": "www",
+  "backgroundColor": "#FFFFFF",
+  "android": {
+    "allowMixedContent": false
+  }
 }
