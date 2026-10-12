@@ -1,36 +1,19 @@
-# Respire Fácil — aplicativo Android
+# Respire Fácil — APK Android
 
-Este projeto transforma a versão web atual do **Respire Fácil** em um aplicativo Android usando **Capacitor**.
+O APK é gerado automaticamente pelo GitHub Actions (Capacitor). Você não precisa instalar Android Studio.
 
-## O que já está preparado
+## Como usar
+1. Copie TODO o conteúdo desta pasta (inclusive a pasta oculta `.github`) para a raiz do seu repositório.
+2. Faça commit e push na branch `main` (ou `master`).
+3. No GitHub, abra a aba **Actions** e aguarde o workflow "Build APK" terminar (uns 5–8 min).
+4. Baixe o `respire-facil.apk` na aba **Releases** (tag `latest`) ou em Actions → run → Artifacts.
+5. No celular, abra o APK e permita "instalar apps de fontes desconhecidas".
 
-- `www/index.html`: a versão web atual do aplicativo.
-- `capacitor.config.json`: nome e identificador do aplicativo.
-- `package.json`: dependências do Capacitor 8.
-- `.github/workflows/build-apk.yml`: gera o APK automaticamente no GitHub Actions.
+O link do botão de download no seu index.html
+(`https://github.com/SEU_USUARIO/SEU_REPOSITORIO/releases/latest/download/respire-facil.apk`)
+passa a funcionar quando você trocar SEU_USUARIO e SEU_REPOSITORIO pelos valores reais.
 
-## Como publicar no GitHub
-
-1. Crie um repositório no GitHub.
-2. Envie todos os arquivos desta pasta para o repositório.
-3. No GitHub, abra **Actions** e execute **Gerar APK Android**.
-4. Quando terminar, abra a execução do workflow e baixe o artefato `respire-facil-apk`.
-
-## Como criar uma versão baixável em Releases
-
-Depois que o projeto estiver no GitHub, crie uma tag, por exemplo:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-O workflow será executado e anexará o `app-debug.apk` automaticamente à GitHub Release.
-
-## Observação sobre assinatura
-
-O APK gerado aqui é um APK de teste (`debug`). Ele serve para instalação direta no Android. Para publicar na Google Play, será necessário configurar assinatura de release e as credenciais da Play Console.
-
-## Requisitos locais (opcional)
-
-Para abrir e testar o projeto no computador, use Node.js 22+ e Android Studio compatível com Capacitor 8. A documentação atual do Capacitor informa que a versão 8 requer Node.js 22+ e Android Studio Otter 2025.2.1 ou mais recente.
+## Importante
+- O APK gerado é assinado com chave de debug: instala normalmente no celular, mas NÃO serve para publicar na Play Store (precisaria de keystore própria + AAB).
+- O app precisa de internet (Supabase e Google Fonts).
+- "Esqueci minha senha": o e-mail de recuperação usa `window.location.href` como redirectTo. Dentro do app isso vira `https://localhost`, que não abre no celular. Troque por a URL pública do seu site (ex.: GitHub Pages).
