@@ -1356,6 +1356,7 @@ async function submitNewPassword(){
   const { error } = await sb.auth.updateUser({ password: p1 });
   if(error){ err.textContent = translateAuthError(error); err.style.display = 'block'; return; }
   showToast('Senha atualizada.');
+  window.__recovery = false;
   await refreshSessionAndRoute();
 }
 async function logout(){
@@ -1371,6 +1372,7 @@ async function refreshSessionAndRoute(){
   const { data } = await sb.auth.getSession();
   session = data.session;
   updateAdminEntry();
+  if(window.__recovery){ return; } // veio do link de redefinição: fica na tela de nova senha
   if(session){
     userId = session.user.id;
     await loadProfileFromDb();
@@ -2351,7 +2353,7 @@ document.querySelectorAll('[data-item]').forEach(item=>{
 sb.auth.onAuthStateChange((event, s)=>{
   session = s;
   updateAdminEntry();
-  if(event === 'PASSWORD_RECOVERY'){ showScreen('auth-new-password'); }
+  if(event === 'PASSWORD_RECOVERY'){ window.__recovery = true; showScreen('auth-new-password'); }
 });
 (async function init(){
   const splashMinDelay = new Promise(resolve => setTimeout(resolve, 3000));
