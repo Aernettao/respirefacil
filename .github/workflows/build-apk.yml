@@ -33,27 +33,76 @@ jobs:
         run: npx cap add android
 
       - name: Gerar ícones do app
-        run: npx capacitor-assets generate --android
+        run: |
+          mkdir -p assets
+          for f in icon-only icon-foreground icon-background; do
+            if [ -f "$f.png" ]; then cp "$f.png" "assets/$f.png"; fi
+          done
+          npx capacitor-assets generate --android
 
       - name: Sincronizar
         run: npx cap sync android
 
-      - name: Compilar APK
+      - name: Conferir o que foi empacotado
+        run: |
+          P=android/app/src/main/assets/public
+          echo "--- conteudo do app ---"
+          ls -la "$P" | head -20
+          echo "imagens: $(ls "$P/img" | wc -l)"
+          test -s "$P/index.html"
+          grep -q "__rf_diag" "$P/index.html"
+          test -d "$P/img"
+          echo "--- config ---"
+          cat android/app/src/main/assets/capacitor.config.json
+
+      - name: Compilar APK do app
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Renomear APK
+      - name: Guardar APK do app
         run: cp android/app/build/outputs/apk/debug/app-debug.apk respire-facil.apk
 
-      - name: Guardar APK como artefato
+      - name: Criar página de teste mínima
+        run: |
+          P=android/app/src/main/assets/public
+          rm -rf "$P"/*
+          cat > "$P/index.html" <<'HTMLEOF'
+          <!doctype html>
+          <html lang="pt-BR"><head><meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Teste</title></head>
+          <body style="font-family:sans-serif;padding:24px;background:#e8f5e9;color:#1b5e20">
+          <h2>O app abre!</h2>
+          <p>O Capacitor e o WebView do seu celular estao funcionando.</p>
+          <p id="js">Testando JavaScript...</p>
+          <p style="font-size:12px;word-break:break-all;color:#333" id="ua"></p>
+          <script>
+          document.getElementById('js').textContent='JavaScript funcionando';
+          document.getElementById('ua').textContent=navigator.userAgent;
+          </script>
+          </body></html>
+          HTMLEOF
+
+      - name: Compilar APK de teste
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Guardar APK de teste
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk teste-minimo.apk
+
+      - name: Guardar APKs como artefato
         uses: actions/upload-artifact@v4
         with:
-          name: respire-facil-apk
-          path: respire-facil.apk
+          name: respire-facil-apks
+          path: |
+            respire-facil.apk
+            teste-minimo.apk
 
       - name: Publicar na aba Releases
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
           name: Respire Fácil (última versão)
-          files: respire-facil.apk
+          files: |
+            respire-facil.apk
+            teste-minimo.apk
